@@ -12,21 +12,35 @@ Weekly Summary is a local-first weekly work summarizer that auto-pulls from Jira
 
 All data stays on your machine in a local SQLite database — nothing is sent to any external server.
 
+![Weekly Summary dashboard](docs/screenshots/dashboard.png)
+
 ---
 
 ## What It Does
 
 - Pulls Jira tickets (resolved, in progress, blocked) from fico-prod.atlassian.net
+- Pulls Confluence pages you created or edited this week
 - Pulls Outlook sent emails via Power Automate export
 - Syncs calendar meetings via ICS feed
 - Auto-captures Claude Code activity via hooks
 - Supports manual entry of highlights, lowlights, and blockers
-- Generates summaries in four formats:
-  - **PPM Weekly Highlights** (default) — paste-ready markdown table for the team doc
-  - **For Stakeholders** — structured narrative with bold topics and source rollups
-  - **For 1:1 with Manager** — stakeholder view + key decisions + next week preview
-  - **For Myself** — full detail with all sections including meetings
+- Generates summaries in four formats (see below)
 - Copy to clipboard for easy pasting into docs, emails, or Teams
+
+---
+
+## Summary Formats
+
+Click **Generate Summary** and choose your audience from the dropdown:
+
+| Format | Contents | Best for |
+|---|---|---|
+| **PPM Weekly Highlights** (default) | Markdown table of highlights + blockers, paste-ready | PPM Weekly Highlights doc |
+| **For Stakeholders** | Narrative opening · highlights with bold topics · Jira/email rollups · Relevant Sources | Leadership updates, status emails |
+| **For 1:1 with Manager** | Everything in stakeholders + Key Decisions + Next Week Preview | Weekly 1:1 prep |
+| **For Myself** | Full detail — all sections including meetings with Jira enrichment | Personal record |
+
+![Generated PPM summary](docs/screenshots/summary-output.png)
 
 ---
 
@@ -50,9 +64,13 @@ Create a `.env` file in the project root with your own credentials:
 JIRA_URL=https://fico-prod.atlassian.net
 JIRA_EMAIL=your_email@fico.com
 JIRA_API_TOKEN=your_token
+
+CONFLUENCE_URL=https://fico-prod.atlassian.net
+CONFLUENCE_EMAIL=your_email@fico.com
+CONFLUENCE_API_TOKEN=your_token
 ```
 
-Generate your Jira API token at: https://id.atlassian.com/manage-profile/security/api-tokens
+Generate your API token at: https://id.atlassian.com/manage-profile/security/api-tokens
 
 ### Step 3: Register Claude Code hooks
 
@@ -74,18 +92,24 @@ Open **http://localhost:3000**
 
 Click **"Add ICS Feed"** on the dashboard and paste your Outlook calendar ICS URL.
 
-> To get your ICS URL: Outlook Web → Settings → Calendar → Shared calendars → Publish a calendar → copy the ICS link.
+> Outlook Web → Settings → Calendar → Shared calendars → Publish a calendar → copy the ICS link.
 
 ### Step 6 (Optional): Set up Outlook email export
 
 Create a Power Automate flow that exports your sent emails weekly to a JSON file in your personal OneDrive. The agent reads this file to classify emails as highlights, lowlights, or blockers.
+
+### Step 7: Sync Jira, Confluence & Email
+
+Click **"Sync Jira & Confluence"** and **"Sync Emails"** in the dashboard to pull this week's activity.
+
+![Jira & Confluence sync panel](docs/screenshots/sync-panel.png)
 
 ---
 
 ## How to Use It
 
 1. Throughout the week, log highlights, lowlights, and blockers as they happen in the dashboard
-2. Click **"Sync Jira & Confluence"** to pull your latest Jira activity
+2. Click **"Sync Jira & Confluence"** to pull your latest Jira tickets and Confluence pages
 3. Click **"Sync Emails"** to pull your Outlook email export
 4. Click **"Generate Summary"** and select your audience format from the dropdown
 5. Click **"Copy to clipboard"** and paste into the PPM weekly doc, an email, or a 1:1 doc
@@ -103,7 +127,7 @@ All data stays on your machine in a local SQLite database at `~/.weekly-pulse/`.
 ## Links
 
 - **GitHub repo:** https://github.com/himankinis/weekly-pulse
-- **Screenshot:** *(will be added manually)*
+- **Screenshot:** *(see above)*
 
 ---
 
