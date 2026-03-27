@@ -1,7 +1,7 @@
 # Weekly Summary Agent — Setup & Usage Guide
 
 **Status:** Live
-**Repo:** https://github.com/himankinis/weekly-pulse
+**Repo:** https://github.com/himankinis/weekly-summary
 **Owner:** Himankini Shah
 
 ---
@@ -129,7 +129,7 @@ All data stays on your machine in a local SQLite database at `~/.weekly-pulse/`.
 
 ## Links
 
-- **GitHub repo:** https://github.com/himankinis/weekly-pulse
+- **GitHub repo:** https://github.com/himankinis/weekly-summary
 - **Screenshot:** *(see above)*
 
 ---
