@@ -10,7 +10,7 @@ import {
 import { format, parseISO, addDays } from "date-fns";
 import type { WeeklySummaryData, SummaryItem } from "@/lib/types";
 
-type Audience = "self" | "manager" | "stakeholders";
+type Audience = "ppm" | "self" | "manager" | "stakeholders";
 
 interface Props {
   weekStart: string;
@@ -21,7 +21,7 @@ export default function SummaryPanel({ weekStart }: Props) {
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [audience, setAudience] = useState<Audience>("self");
+  const [audience, setAudience] = useState<Audience>("ppm");
 
   const generate = async (force = false) => {
     setLoading(true);
@@ -99,7 +99,8 @@ export default function SummaryPanel({ weekStart }: Props) {
 
   const copyToClipboard = async () => {
     if (!summary) return;
-    await navigator.clipboard.writeText(buildCopyText(summary, audience));
+    const text = audience === "ppm" ? buildPPMText(summary) : buildCopyText(summary, audience);
+    await navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -127,6 +128,7 @@ export default function SummaryPanel({ weekStart }: Props) {
                   onChange={(e) => setAudience(e.target.value as Audience)}
                   className="h-7 text-xs py-0 px-2 w-auto"
                 >
+                  <option value="ppm">PPM Weekly</option>
                   <option value="self">For myself</option>
                   <option value="manager">For 1:1</option>
                   <option value="stakeholders">For stakeholders</option>
@@ -172,7 +174,11 @@ export default function SummaryPanel({ weekStart }: Props) {
           <div className="rounded-md bg-destructive/10 text-destructive px-4 py-3 text-sm">{error}</div>
         )}
 
-        {summary && !loading && (
+        {summary && !loading && audience === "ppm" && (
+          <PPMPreview summary={summary} />
+        )}
+
+        {summary && !loading && audience !== "ppm" && (
           <div className="space-y-4">
             {/* Quantitative line */}
             <p className="text-xs text-muted-foreground leading-relaxed">
@@ -269,7 +275,87 @@ function audienceHighlights(s: WeeklySummaryData, audience: Audience): SummaryIt
   return s.highlights;
 }
 
+// PPM-specific: manual + Jira + hook only (no raw email sends)
+function ppmHighlights(s: WeeklySummaryData): SummaryItem[] {
+  return s.highlights
+    .filter((h) => h.source === "manual" || h.source === "jira" || h.source === "hook")
+    .slice(0, 5);
+}
+
+function ppmBlockers(s: WeeklySummaryData): SummaryItem[] {
+  return s.blockers
+    .filter((b) => b.source === "manual" || b.source === "jira")
+    .slice(0, 3);
+}
+
+function buildPPMText(s: WeeklySummaryData): string {
+  const weekStart = format(parseISO(s.weekStart), "MMM d");
+  const weekEnd   = format(parseISO(s.weekEnd),   "MMM d");
+  const highlights = ppmHighlights(s);
+  const blockers   = ppmBlockers(s);
+  const rows = Math.max(highlights.length, blockers.length, 1);
+
+  const lines: string[] = [
+    `## ${weekStart} – ${weekEnd}`,
+    "",
+    "# Platform Experience & Adoption",
+    "",
+    "**Himankini Shah**",
+    "| Highlights | Blockers |",
+    "| --- | --- |",
+  ];
+
+  for (let i = 0; i < rows; i++) {
+    const h = highlights[i] ? `· ${highlights[i].content}` : "";
+    const b = blockers[i]   ? `· ${blockers[i].content}`   : "";
+    lines.push(`| ${h} | ${b} |`);
+  }
+
+  return lines.join("\n");
+}
+
 // ─── Sub-components ───────────────────────────────────────────────────────────
+
+function PPMPreview({ summary }: { summary: WeeklySummaryData }) {
+  const weekStart = format(parseISO(summary.weekStart), "MMM d");
+  const weekEnd   = format(parseISO(summary.weekEnd),   "MMM d");
+  const highlights = ppmHighlights(summary);
+  const blockers   = ppmBlockers(summary);
+  const rows = Math.max(highlights.length, blockers.length, 1);
+
+  return (
+    <div className="space-y-3">
+      <p className="text-xs text-muted-foreground">
+        Paste-ready for the PPM Weekly Highlights doc. Hit Copy to grab the markdown.
+      </p>
+      <div className="rounded-md border border-border bg-muted/40 p-3 space-y-2 text-sm font-mono">
+        <p className="font-semibold text-foreground">## {weekStart} – {weekEnd}</p>
+        <p className="font-semibold text-foreground"># Platform Experience &amp; Adoption</p>
+        <p className="font-bold text-foreground">Himankini Shah</p>
+        <table className="w-full text-xs border-collapse">
+          <thead>
+            <tr>
+              <th className="border border-border px-2 py-1 text-left font-semibold w-1/2">Highlights</th>
+              <th className="border border-border px-2 py-1 text-left font-semibold w-1/2">Blockers</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Array.from({ length: rows }).map((_, i) => (
+              <tr key={i}>
+                <td className="border border-border px-2 py-1 align-top">
+                  {highlights[i] ? <span>· {highlights[i].content}</span> : null}
+                </td>
+                <td className="border border-border px-2 py-1 align-top text-red-700 dark:text-red-400">
+                  {blockers[i] ? <span>· {blockers[i].content}</span> : null}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
 
 function SummarySection({
   title,
