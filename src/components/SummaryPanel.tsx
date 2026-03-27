@@ -137,9 +137,10 @@ export default function SummaryPanel({ weekStart }: Props) {
 // ─── PPM View ─────────────────────────────────────────────────────────────────
 
 function ppmHighlights(s: WeeklySummaryData): SummaryItem[] {
-  // All sources — manual first, then jira, hook, email, calendar
-  const order = ["manual", "jira", "hook", "email", "calendar"];
-  return [...s.highlights].sort((a, b) => order.indexOf(a.source) - order.indexOf(b.source)).slice(0, 5);
+  // PPM only shows manually logged and Jira entries — email/hook subjects are too noisy
+  return s.highlights
+    .filter((h) => h.source === "manual" || h.source === "jira")
+    .slice(0, 5);
 }
 
 function ppmBlockers(s: WeeklySummaryData): SummaryItem[] {
@@ -151,7 +152,6 @@ function buildPPMText(s: WeeklySummaryData): string {
   const weekEnd   = format(parseISO(s.weekEnd),   "MMM d");
   const highlights = ppmHighlights(s);
   const blockers   = ppmBlockers(s);
-  const rows = Math.max(highlights.length, blockers.length, 1);
 
   const lines: string[] = [
     `## ${weekStart} – ${weekEnd}`,
@@ -162,10 +162,16 @@ function buildPPMText(s: WeeklySummaryData): string {
     "| Highlights | Blockers |",
     "| --- | --- |",
   ];
-  for (let i = 0; i < rows; i++) {
-    const h = highlights[i] ? `· ${highlights[i].content}` : "";
-    const b = blockers[i]   ? `· ${blockers[i].content}`   : "";
-    lines.push(`| ${h} | ${b} |`);
+
+  if (highlights.length === 0 && blockers.length === 0) {
+    lines.push("| *(no highlights logged this week)* |  |");
+  } else {
+    const rows = Math.max(highlights.length, blockers.length, 1);
+    for (let i = 0; i < rows; i++) {
+      const h = highlights[i] ? `· ${highlights[i].content}` : "";
+      const b = blockers[i]   ? `· ${blockers[i].content}`   : "";
+      lines.push(`| ${h} | ${b} |`);
+    }
   }
   return lines.join("\n");
 }
@@ -175,6 +181,7 @@ function PPMView({ summary }: { summary: WeeklySummaryData }) {
   const weekEnd   = format(parseISO(summary.weekEnd),   "MMM d");
   const highlights = ppmHighlights(summary);
   const blockers   = ppmBlockers(summary);
+  const isEmpty = highlights.length === 0 && blockers.length === 0;
   const rows = Math.max(highlights.length, blockers.length, 1);
 
   return (
@@ -182,6 +189,11 @@ function PPMView({ summary }: { summary: WeeklySummaryData }) {
       <p className="text-xs text-muted-foreground">
         Paste-ready for the PPM Weekly Highlights doc. Hit Copy to grab the markdown.
       </p>
+      {isEmpty && (
+        <div className="rounded-md border border-amber-200 bg-amber-50 dark:bg-amber-950 dark:border-amber-800 px-4 py-3 text-xs text-amber-700 dark:text-amber-400">
+          No highlights logged this week. Add manual entries from the dashboard to populate the PPM table.
+        </div>
+      )}
       <div className="rounded-md border border-border bg-muted/40 p-3 space-y-1.5 text-sm font-mono">
         <p className="font-semibold">## {weekStart} – {weekEnd}</p>
         <p className="font-semibold"># Platform Experience &amp; Adoption</p>
@@ -194,16 +206,24 @@ function PPMView({ summary }: { summary: WeeklySummaryData }) {
             </tr>
           </thead>
           <tbody>
-            {Array.from({ length: rows }).map((_, i) => (
-              <tr key={i}>
-                <td className="border border-border px-2 py-1 align-top">
-                  {highlights[i] && <span>· {highlights[i].content}</span>}
-                </td>
-                <td className="border border-border px-2 py-1 align-top text-red-700 dark:text-red-400">
-                  {blockers[i] && <span>· {blockers[i].content}</span>}
+            {isEmpty ? (
+              <tr>
+                <td className="border border-border px-2 py-1 align-top text-muted-foreground italic" colSpan={2}>
+                  No highlights logged this week
                 </td>
               </tr>
-            ))}
+            ) : (
+              Array.from({ length: rows }).map((_, i) => (
+                <tr key={i}>
+                  <td className="border border-border px-2 py-1 align-top">
+                    {highlights[i] && <span>· {highlights[i].content}</span>}
+                  </td>
+                  <td className="border border-border px-2 py-1 align-top text-red-700 dark:text-red-400">
+                    {blockers[i] && <span>· {blockers[i].content}</span>}
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
