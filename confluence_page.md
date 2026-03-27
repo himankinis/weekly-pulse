@@ -49,7 +49,7 @@ All formats synthesize raw data into PM-quality language. Highlights are automat
 
 ## Setup Instructions
 
-**Prerequisites:** Node.js 20+, Claude Code installed
+**Prerequisites:** Node.js 20+, Claude Code installed (https://confluence.atlassian.fico.com/wiki/spaces/PE/pages/140248200/Claude+Code+Setup)
 
 ### Step 1: Clone the repo
 
