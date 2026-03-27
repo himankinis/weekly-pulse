@@ -137,9 +137,12 @@ export default function SummaryPanel({ weekStart }: Props) {
 // ─── PPM View ─────────────────────────────────────────────────────────────────
 
 function ppmHighlights(s: WeeklySummaryData): SummaryItem[] {
-  // PPM only shows manually logged and Jira entries — email/hook subjects are too noisy
+  // Generator already synthesizes all sources into PM-quality content.
+  // Priority: manual > confluence > jira > email (hooks excluded).
+  const order = ["manual", "confluence", "jira", "email"];
   return s.highlights
-    .filter((h) => h.source === "manual" || h.source === "jira")
+    .filter((h) => order.includes(h.source))
+    .sort((a, b) => order.indexOf(a.source) - order.indexOf(b.source))
     .slice(0, 5);
 }
 
