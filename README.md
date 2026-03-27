@@ -30,6 +30,8 @@ Click **Generate Summary** and choose your audience from the dropdown:
 
 ![Generated PPM summary](docs/screenshots/summary-output.png)
 
+![Audience toggle](docs/screenshots/audience-toggle.png)
+
 ## Setup
 
 **Prerequisites:** Node.js 20+, Claude Code installed

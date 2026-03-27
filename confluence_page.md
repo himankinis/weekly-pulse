@@ -42,6 +42,8 @@ Click **Generate Summary** and choose your audience from the dropdown:
 
 ![Generated PPM summary](docs/screenshots/summary-output.png)
 
+![Audience toggle](docs/screenshots/audience-toggle.png)
+
 ---
 
 ## Setup Instructions
