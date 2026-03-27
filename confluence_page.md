@@ -1,7 +1,7 @@
 # Weekly Summary — AI Productivity Tool for PMs
 
 **Status:** Live
-**Repo:** https://github.com/himankinis/weekly-pulse
+**Repo:** https://github.com/himankinis/weekly-summary
 **Owner:** Himankini Shah
 
 ---
@@ -44,7 +44,7 @@ At week's end, one click generates a formatted summary covering accomplishments,
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/himankinis/weekly-pulse
+git clone https://github.com/himankinis/weekly-summary
 cd weekly-pulse
 
 # 2. Install dependencies

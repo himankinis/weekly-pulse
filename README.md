@@ -20,7 +20,7 @@ All data stays on your machine at `~/.weekly-pulse/weekly-pulse.db`.
 **Prerequisites:** Node.js 20+
 
 ```bash
-git clone https://github.com/himankinis/weekly-pulse
+git clone https://github.com/himankinis/weekly-summary
 cd weekly-pulse
 npm install
 
