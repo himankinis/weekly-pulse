@@ -9,11 +9,13 @@ Built as part of the **AI Hacks for PMs** initiative.
 ## What it does
 
 - **Manual entries** — log highlights, lowlights, and blockers directly from the dashboard
-- **Jira via API** — syncs resolved, in-progress, and blocked tickets from fico-prod.atlassian.net
-- **Confluence via API** — syncs pages you created or edited this week
-- **Outlook emails via Power Automate** — imports sent emails, classifies them as highlights or blockers
-- **Calendar via ICS** — pulls meetings from your Outlook ICS feed
+- **Jira via API** — syncs tickets and translates status into accomplishments: "Completed X", "Drove progress on X", "Initiated X"
+- **Confluence via API** — syncs pages you created or edited; surfaces as "Published X on Confluence"
+- **Outlook emails via Power Automate** — groups email threads by topic and synthesizes into PM actions: "Led cross-functional discussion on X", "Aligned with Y on Z", "Drove alignment on X with Y (N touchpoints)"
+- **Calendar via ICS** — pulls meetings and filters out routine standups, 1:1s, and update meetings; keeps reviews, roadmap sessions, leadership calls, and working sessions
 - **Claude Code auto-capture** — captures prompts via a hook on every Claude Code session
+
+The summary generator synthesizes all raw data into PM-quality highlights — no "Sent email: Subject to Person" noise. Manual entries always take priority (up to 5 highlights, 3 blockers); synthesized items fill remaining slots ranked by source quality.
 
 All data stays on your machine at `~/.weekly-pulse/weekly-pulse.db` — nothing is sent to any external server.
 
@@ -23,10 +25,12 @@ Click **Generate Summary** and choose your audience from the dropdown:
 
 | Format | Best for |
 |---|---|
-| **PPM Weekly Highlights** (default) | Paste-ready markdown table for the team doc |
+| **PPM Weekly Highlights** (default) | Paste-ready markdown table — max 5 highlights, 3 blockers |
 | **For Stakeholders** | Narrative with bold topics, Jira/email rollups, and source list |
 | **For 1:1 with Manager** | Stakeholder view + key decisions + next week preview |
 | **For Myself** | Full detail — all sections including meetings and Jira enrichment |
+
+All formats use synthesized, action-oriented language. Raw email subjects and Jira ticket IDs are never shown as-is.
 
 ![Generated PPM summary](docs/screenshots/summary-output.png)
 

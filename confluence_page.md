@@ -18,14 +18,13 @@ All data stays on your machine in a local SQLite database — nothing is sent to
 
 ## What It Does
 
-- Pulls Jira tickets (resolved, in progress, blocked) from fico-prod.atlassian.net
-- Pulls Confluence pages you created or edited this week
-- Pulls Outlook sent emails via Power Automate export
-- Syncs calendar meetings via ICS feed
-- Auto-captures Claude Code activity via hooks
-- Supports manual entry of highlights, lowlights, and blockers
-- Generates summaries in four formats (see below)
-- Copy to clipboard for easy pasting into docs, emails, or Teams
+- **Manual entries** — log highlights, lowlights, and blockers directly from the dashboard; these always take priority in the summary
+- **Jira tickets** — syncs resolved, in-progress, and blocked tickets; translates status into accomplishments: "Completed X (Jira: KEY-123)", "Drove progress on X", "Initiated X"
+- **Confluence pages** — syncs pages you created or edited; surfaces as "Published X on Confluence" or "Updated X on Confluence"
+- **Outlook emails** — groups email threads by topic and synthesizes into PM actions: "Led cross-functional discussion on X (N touchpoints)", "Aligned with Y on Z", "Discussed X with Y" — raw "Sent email: subject" lines are never shown
+- **Calendar** — syncs meetings via ICS feed; filters out routine standups, 1:1s, and update meetings; keeps reviews, roadmap sessions, leadership calls, and working sessions
+- **Claude Code hooks** — auto-captures prompts as activity entries in the background
+- Copy any format to clipboard for pasting into docs, emails, or Teams
 
 ---
 
@@ -35,10 +34,12 @@ Click **Generate Summary** and choose your audience from the dropdown:
 
 | Format | Contents | Best for |
 |---|---|---|
-| **PPM Weekly Highlights** (default) | Markdown table of highlights + blockers, paste-ready | PPM Weekly Highlights doc |
+| **PPM Weekly Highlights** (default) | Paste-ready markdown table — max 5 highlights, 3 blockers | PPM Weekly Highlights doc |
 | **For Stakeholders** | Narrative opening · highlights with bold topics · Jira/email rollups · Relevant Sources | Leadership updates, status emails |
 | **For 1:1 with Manager** | Everything in stakeholders + Key Decisions + Next Week Preview | Weekly 1:1 prep |
 | **For Myself** | Full detail — all sections including meetings with Jira enrichment | Personal record |
+
+All formats synthesize raw data into PM-quality language. The summary generator groups related email threads, translates Jira statuses into accomplishments, and filters calendar noise — so every line starts with an action verb and reflects real work, not activity metadata.
 
 ![Generated PPM summary](docs/screenshots/summary-output.png)
 
