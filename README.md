@@ -111,7 +111,16 @@ Click **"Sync Jira & Confluence"** in the dashboard to pull this week's tickets 
 | 🚫 Blocker | Dependency, access issue, waiting on others |
 | 📋 To-do | Task to complete this week or next — check it off when done |
 
-To-dos appear as a dedicated section in the weekly summary. Completed to-dos are excluded from the summary automatically.
+### Weekly To-Dos panel
+
+The **Weekly To-Dos** panel (left column, below Log an Entry) is a dedicated task tracker separate from the log:
+
+- Add to-dos with the text input and press Enter or click **+**
+- Check the checkbox to mark complete — completed items move below the divider with strikethrough
+- Hover any item to reveal the trash icon and delete it
+- **X/Y completed** count shown in the panel header
+- Incomplete to-dos **auto-carry forward** into the next week — carried items are labelled *(carried over)*
+- The **Weekly Summary** includes a **📝 To-Do Progress** section showing what was completed (strikethrough) and what's carrying over
 
 ## Tech stack
 

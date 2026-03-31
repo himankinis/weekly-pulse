@@ -118,13 +118,22 @@ Click **"Sync Jira & Confluence"** and **"Sync Emails"** in the dashboard to pul
 | 🚫 Blocker | Dependency, access issue, waiting on others |
 | 📋 To-do | Task to complete this week or next — check it off when done |
 
-To-dos appear as a dedicated **📝 To-dos** section in the weekly summary. Completed to-dos are automatically excluded from the summary.
+### Weekly To-Dos Panel
+
+The **Weekly To-Dos** panel (left column, below Log an Entry) is a dedicated task tracker separate from the entry log:
+
+- Add to-dos with the text input and press Enter or click **+**
+- Check the checkbox to mark complete — completed items move below the divider with strikethrough text
+- Hover any item to reveal the trash icon and delete it
+- **X/Y completed** count is shown in the panel header at a glance
+- Incomplete to-dos **automatically carry forward** into the next week — carried items are labelled *(carried over)*
+- The **Weekly Summary** includes a **📝 To-Do Progress** section across all audience formats (PPM Weekly, Stakeholders, 1:1, Myself) showing what was completed and what's carrying over
 
 ---
 
 ## How to Use It
 
-1. Throughout the week, log highlights, lowlights, blockers, and to-dos as they happen in the dashboard; check off to-dos as you complete them
+1. Throughout the week, log highlights, lowlights, and blockers in the **Log an Entry** panel; add tasks to the **Weekly To-Dos** panel and check them off as you complete them — incomplete ones carry forward automatically
 2. Click **"Sync Jira & Confluence"** to pull your latest Jira tickets and Confluence pages
 3. Click **"Sync Emails"** to pull your Outlook email export
 4. Click **"Generate Summary"** and select your audience format from the dropdown
