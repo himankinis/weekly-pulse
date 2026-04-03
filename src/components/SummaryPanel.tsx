@@ -8,15 +8,27 @@ import {
   Loader2, Copy, Download, CheckCheck, Sparkles, RefreshCw,
 } from "lucide-react";
 import { format, parseISO, addDays } from "date-fns";
-import type { WeeklySummaryData, SummaryItem } from "@/lib/types";
+import type { WeeklySummaryData, SummaryItem, LogEntry } from "@/lib/types";
 
 type Audience = "ppm" | "self" | "manager" | "stakeholders";
 
 interface Props {
   weekStart: string;
+  entries: LogEntry[];
 }
 
-export default function SummaryPanel({ weekStart }: Props) {
+/** Derive live todo state from the current entries array (always up-to-date). */
+function liveTodosFromEntries(entries: LogEntry[]): Pick<WeeklySummaryData, "todos" | "completedTodos"> {
+  const todos: SummaryItem[] = entries
+    .filter((e) => e.type === "todo" && !e.completed)
+    .map((e) => ({ content: e.content, source: e.source, date: e.entry_date }));
+  const completedTodos: SummaryItem[] = entries
+    .filter((e) => e.type === "todo" && Boolean(e.completed))
+    .map((e) => ({ content: e.content, source: e.source, date: e.entry_date }));
+  return { todos, completedTodos };
+}
+
+export default function SummaryPanel({ weekStart, entries }: Props) {
   const [summary, setSummary] = useState<WeeklySummaryData | null>(null);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -47,13 +59,16 @@ export default function SummaryPanel({ weekStart }: Props) {
     }
   };
 
+  // Always use live todo state from the current entries (avoids stale cached summary todos)
+  const displaySummary = summary ? { ...summary, ...liveTodosFromEntries(entries) } : null;
+
   const copyToClipboard = async () => {
-    if (!summary) return;
+    if (!displaySummary) return;
     let text = "";
-    if (audience === "ppm")          text = buildPPMText(summary);
-    else if (audience === "stakeholders") text = buildStakeholdersText(summary);
-    else if (audience === "manager")  text = buildManagerText(summary);
-    else                              text = buildSelfText(summary);
+    if (audience === "ppm")          text = buildPPMText(displaySummary);
+    else if (audience === "stakeholders") text = buildStakeholdersText(displaySummary);
+    else if (audience === "manager")  text = buildManagerText(displaySummary);
+    else                              text = buildSelfText(displaySummary);
     await navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -72,7 +87,7 @@ export default function SummaryPanel({ weekStart }: Props) {
             Weekly Summary
           </CardTitle>
           <div className="flex items-center gap-2">
-            {summary && (
+            {displaySummary && (
               <>
                 <Select
                   value={audience}
@@ -102,7 +117,7 @@ export default function SummaryPanel({ weekStart }: Props) {
       </CardHeader>
 
       <CardContent>
-        {!summary && !loading && (
+        {!displaySummary && !loading && (
           <div className="text-center py-8">
             <p className="text-sm text-muted-foreground mb-4">
               Generate a structured summary of your week's work.
@@ -125,10 +140,10 @@ export default function SummaryPanel({ weekStart }: Props) {
           <div className="rounded-md bg-destructive/10 text-destructive px-4 py-3 text-sm">{error}</div>
         )}
 
-        {summary && !loading && audience === "ppm" && <PPMView summary={summary} />}
-        {summary && !loading && audience === "stakeholders" && <StakeholdersView summary={summary} />}
-        {summary && !loading && audience === "manager" && <ManagerView summary={summary} />}
-        {summary && !loading && audience === "self" && <SelfView summary={summary} />}
+        {displaySummary && !loading && audience === "ppm" && <PPMView summary={displaySummary} />}
+        {displaySummary && !loading && audience === "stakeholders" && <StakeholdersView summary={displaySummary} />}
+        {displaySummary && !loading && audience === "manager" && <ManagerView summary={displaySummary} />}
+        {displaySummary && !loading && audience === "self" && <SelfView summary={displaySummary} />}
       </CardContent>
     </Card>
   );

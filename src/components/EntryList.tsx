@@ -250,7 +250,8 @@ export default function EntryList({ entries, onDelete, onUpdate }: Props) {
     );
   }
 
-  const manualEntries = entries.filter((e) => e.source !== "hook");
+  const manualEntries = entries.filter((e) => e.source !== "hook" && e.source !== "teams");
+  const teamsEntries = entries.filter((e) => e.source === "teams");
   const hookEntries = entries.filter((e) => e.source === "hook");
 
   return (
@@ -294,6 +295,19 @@ export default function EntryList({ entries, onDelete, onUpdate }: Props) {
                 ))}
               </div>
             ))}
+
+          {teamsEntries.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <MessageSquare className="h-3.5 w-3.5 text-teal-500" />
+                <span className="text-sm font-medium text-foreground">Teams Activity</span>
+                <Badge variant="outline" className="text-xs px-1.5 py-0">{teamsEntries.length}</Badge>
+              </div>
+              {teamsEntries.map((entry) => (
+                <EntryRow key={entry.id} entry={entry} onDelete={onDelete} onUpdate={onUpdate} />
+              ))}
+            </div>
+          )}
 
           {hookEntries.length > 0 && (
             <div>
