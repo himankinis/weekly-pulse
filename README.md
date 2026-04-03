@@ -1,6 +1,6 @@
 # Weekly Summary
 
-A local-first weekly work summarizer for PMs. Auto-pulls from Jira, Outlook, calendar, and Claude Code to generate structured weekly summaries in multiple formats — PPM Weekly Highlights table, stakeholder narrative, 1:1 prep, and personal reference. Saves 30–60 min/week on status reporting.
+A local-first weekly work summarizer for PMs. Auto-pulls from Jira, Outlook, Microsoft Teams, calendar, and Claude Code to generate structured weekly summaries in multiple formats — PPM Weekly Highlights table, stakeholder narrative, 1:1 prep, and personal reference. Saves 30–60 min/week on status reporting.
 
 Built as part of the **AI Hacks for PMs** initiative.
 
@@ -12,10 +12,11 @@ Built as part of the **AI Hacks for PMs** initiative.
 - **Jira via API** — syncs tickets and translates status into accomplishments: "Completed X", "Drove progress on X", "Initiated X"
 - **Confluence via API** — syncs pages you created or edited; surfaces as "Published X on Confluence"
 - **Outlook emails via Power Automate** — groups email threads by topic and synthesizes into PM actions: "Led cross-functional discussion on X", "Aligned with Y on Z", "Drove alignment on X with Y (N touchpoints)"
+- **Microsoft Teams via OneDrive export** — syncs Teams chat messages from a JSON export file; surfaces meaningful conversations as highlights
 - **Calendar via ICS** — pulls meetings and filters out routine standups, 1:1s, and update meetings; keeps reviews, roadmap sessions, leadership calls, and working sessions
 - **Claude Code auto-capture** — captures prompts via a hook on every Claude Code session
 
-The summary generator synthesizes all raw data into PM-quality highlights — no "Sent email: Subject to Person" noise. Manual entries always take priority (up to 5 highlights, 3 blockers); synthesized items fill remaining slots ranked by source quality.
+The summary generator synthesizes all raw data into PM-quality highlights — no "Sent email: Subject to Person" noise. Manual entries always take priority; synthesized items fill remaining slots ranked by source quality. Completed to-dos surface as highlights (accomplishments); incomplete to-dos surface in blockers (pending items).
 
 All data stays on your machine at `~/.weekly-pulse/weekly-pulse.db` — nothing is sent to any external server.
 
@@ -35,6 +36,15 @@ All formats synthesize raw data into PM-quality language. Highlights are automat
 ![Generated PPM summary](docs/screenshots/summary-output.png)
 
 ![Audience toggle](docs/screenshots/audience-toggle.png)
+
+## Time Intelligence (Trends)
+
+Click **Trends** in the header to open the Time Intelligence page:
+
+- **Activity heatmap** — Mon–Fri × 8am–8pm grid showing when you're most active across meetings and log entries
+- **PM work breakdown** — bar chart of time across Meetings, Communication, Planning, Development, and Manual categories
+- **Weekly trend** — line chart comparing this week vs last week, day by day
+- **Auto-generated insights** — plain-text observations about your work patterns (e.g. "Most active on Thursday · 3 meetings Tuesday")
 
 ## Setup
 
@@ -86,9 +96,13 @@ Click **"Add ICS Feed"** on the dashboard and paste your Outlook calendar ICS UR
 
 ### 5. Set up Outlook email export (optional)
 
-Create a Power Automate flow that exports your sent emails to a JSON file in your OneDrive. The agent reads this file weekly to classify emails as highlights or blockers.
+Create a Power Automate flow that exports your sent emails to a JSON file in your OneDrive at `OneDrive - FICO/WeeklyPulse/email_export.json`. The agent reads this file weekly to classify emails as highlights or blockers.
 
-### 6. Sync Jira & Confluence
+### 6. Set up Teams export (optional)
+
+Export your Teams messages to `OneDrive - FICO/WeeklyPulse/teams_export.json`. Click **"Sync Teams"** in the dashboard to import. Supports the custom export format (`topicCHANNEL`, `FromSENDER`, `message_previewBODY`) as well as the standard Microsoft Graph API format.
+
+### 7. Sync Jira & Confluence
 
 Click **"Sync Jira & Confluence"** in the dashboard to pull this week's tickets and pages.
 
@@ -113,19 +127,32 @@ Click **"Sync Jira & Confluence"** in the dashboard to pull this week's tickets 
 
 ### Weekly To-Dos panel
 
-The **Weekly To-Dos** panel (left column, below Log an Entry) is a dedicated task tracker separate from the log:
+The **Weekly To-Dos** panel (left column, below Log an Entry) is a dedicated task tracker:
 
 - Add to-dos with the text input and press Enter or click **+**
 - Check the checkbox to mark complete — completed items move below the divider with strikethrough
 - Hover any item to reveal the trash icon and delete it
 - **X/Y completed** count shown in the panel header
 - Incomplete to-dos **auto-carry forward** into the next week — carried items are labelled *(carried over)*
-- The **Weekly Summary** includes a **📝 To-Do Progress** section showing what was completed (strikethrough) and what's carrying over
+- Completed to-dos appear as **Highlights** in the generated summary (accomplishments); incomplete to-dos appear as **Blockers** (pending items)
+
+## Entry sources
+
+| Source | How captured |
+|---|---|
+| Manual | Typed in dashboard log input |
+| Jira | Synced via Atlassian REST API |
+| Confluence | Synced via Atlassian REST API |
+| Email | Imported from OneDrive JSON export (Power Automate) |
+| Teams | Imported from OneDrive JSON export |
+| Calendar | Pulled from ICS URL feed |
+| Claude (hook) | Auto-captured from Claude Code prompt hook |
 
 ## Tech stack
 
 - **Framework:** Next.js 15 with App Router
 - **Database:** SQLite via `better-sqlite3`
 - **UI:** shadcn/ui + Tailwind CSS
+- **Charts:** Recharts (Trends page)
 - **Language:** TypeScript
-- **Integrations:** Jira REST API, Confluence REST API, Outlook via Power Automate, ICS calendar feeds
+- **Integrations:** Jira REST API, Confluence REST API, Outlook via Power Automate, Microsoft Teams JSON export, ICS calendar feeds
